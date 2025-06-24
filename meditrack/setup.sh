@@ -11,4 +11,9 @@ python manage.py makemigrations pharmacy
 echo "Applying migrations..."
 python manage.py migrate
 
+#run the server
+echo "Starting the server..."       
+python manage.py runserver
+
+#setup success message
 echo "Setup completed successfully!"
