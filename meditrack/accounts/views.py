@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
@@ -48,13 +48,22 @@ class PatientListView(generics.ListAPIView):
     permission_classes = (IsDoctor,)
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+    filter_backends = [filters.SearchFilter]
+    # Allow search by id, first name, and last name
+    search_fields = ['id', 'user__first_name', 'user__last_name']
 
 class DoctorListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DoctorSerializer
     queryset = Doctor.objects.all()
+    filter_backends = [filters.SearchFilter]
+    # Allow search by id, first name, and last name
+    search_fields = ['id', 'user__first_name', 'user__last_name']
 
 class PharmacistListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PharmacistSerializer
     queryset = Pharmacist.objects.all()
+    filter_backends = [filters.SearchFilter]
+    # Allow search by id, first name, and last name
+    search_fields = ['id', 'user__first_name', 'user__last_name']
