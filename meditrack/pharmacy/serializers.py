@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import PharmacyLog
-from medical.models import Prescription
-from medical.serializers import PrescriptionSerializer
+from medical.models import Prescription, Medication
+from medical.serializers import MedicationSerializer
+from accounts.models import Patient
 from datetime import datetime
 
 class PharmacyLogSerializer(serializers.ModelSerializer):
@@ -33,3 +34,31 @@ class PrescriptionFillSerializer(serializers.ModelSerializer):
         )
         
         return instance
+
+# New serializer for pharmacist dashboard with limited patient info
+class PatientLimitedInfoSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Patient
+        fields = ('id', 'full_name')
+    
+    def get_full_name(self, obj):
+        return obj.user.get_full_name()
+
+# New serializer for pharmacist dashboard with prescriptions
+class PharmacistPrescriptionSerializer(serializers.ModelSerializer):
+    patient = serializers.SerializerMethodField()
+    medications = MedicationSerializer(many=True, read_only=True)
+    prescription_id = serializers.CharField(source='id', read_only=True)
+    created_date = serializers.DateTimeField(source='created_at', format='%Y-%m-%d', read_only=True)
+    
+    class Meta:
+        model = Prescription
+        fields = ('prescription_id', 'status', 'filled_date', 'created_date', 'patient', 'medications')
+        read_only_fields = ('prescription_id', 'created_date', 'filled_date')
+    
+    def get_patient(self, obj):
+        patient = obj.medical_record.patient
+        serializer = PatientLimitedInfoSerializer(patient)
+        return serializer.data
