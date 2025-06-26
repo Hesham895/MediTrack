@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import MedicalRecord, Prescription, Medication
+from accounts.models import Doctor
 
 class MedicationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,8 +12,26 @@ class PrescriptionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Prescription
-        fields = ('id', 'status', 'filled_date', 'created_at', 'medications')
+        fields = ('id', 'status', 'filled_date', 'created_at', 'medical_record', 'medications')
         read_only_fields = ('created_at',)
+    
+    def validate_medical_record(self, value):
+        """
+        Check that the medical record exists and user has permission.
+        """
+        try:
+            record = MedicalRecord.objects.get(id=value.id)
+            # Check if the user is the doctor for this record or has appropriate permissions
+            user = self.context.get('request', None).user if self.context.get('request') else None
+            if user and hasattr(user, 'is_doctor') and user.is_doctor:
+                doctor = Doctor.objects.get(user=user)
+                if record.doctor != doctor:
+                    raise serializers.ValidationError("You don't have permission for this medical record.")
+            return value
+        except MedicalRecord.DoesNotExist:
+            raise serializers.ValidationError(f"Medical record with ID {value.id} does not exist.")
+        except Exception as e:
+            raise serializers.ValidationError(f"Validation error: {str(e)}")
     
     def create(self, validated_data):
         medications_data = validated_data.pop('medications')
@@ -24,18 +43,9 @@ class PrescriptionSerializer(serializers.ModelSerializer):
         return prescription
 
 class MedicalRecordSerializer(serializers.ModelSerializer):
-    doctor_name = serializers.SerializerMethodField()
-    patient_name = serializers.SerializerMethodField()
     prescriptions = PrescriptionSerializer(many=True, read_only=True)
     
     class Meta:
         model = MedicalRecord
-        fields = ('id', 'doctor', 'doctor_name', 'patient', 'patient_name', 
-                  'diagnosis', 'symptoms', 'notes', 'created_at', 'prescriptions')
-        read_only_fields = ('created_at',)
-    
-    def get_doctor_name(self, obj):
-        return f"Dr. {obj.doctor.user.get_full_name()}"
-    
-    def get_patient_name(self, obj):
-        return obj.patient.user.get_full_name()
+        fields = ('id', 'patient', 'doctor', 'diagnosis', 'symptoms', 'notes', 'created_at', 'prescriptions')
+        read_only_fields = ('created_at', 'doctor')
