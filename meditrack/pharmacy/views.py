@@ -67,27 +67,24 @@ class PharmacyLogViewSet(viewsets.ReadOnlyModelViewSet):
 # New pharmacist dashboard view
 class PharmacistDashboardView(APIView):
     """
-    API endpoint that provides an overview of pending prescriptions and
-    recently filled prescriptions for the pharmacist dashboard.
+    API endpoint that provides an overview of filled prescriptions
+    for the pharmacist dashboard.
     """
     permission_classes = [IsPharmacist]
     
     def get(self, request):
-        # Get pending prescriptions
-        pending_prescriptions = Prescription.objects.filter(status='pending')
-        
-        # Get recently filled prescriptions by this pharmacist
+        # Get the pharmacist
         pharmacist = get_object_or_404(Pharmacist, user=request.user)
-        filled_logs = PharmacyLog.objects.filter(pharmacist=pharmacist).order_by('-created_at')[:5]
+        
+        # Get all prescriptions filled by this pharmacist
+        filled_logs = PharmacyLog.objects.filter(pharmacist=pharmacist).order_by('-created_at')
         filled_prescriptions = [log.prescription for log in filled_logs]
         
         # Serialize the prescriptions with limited patient info
-        pending_serializer = PharmacistPrescriptionSerializer(pending_prescriptions, many=True)
         filled_serializer = PharmacistPrescriptionSerializer(filled_prescriptions, many=True)
         
         return Response({
-            'pending_prescriptions': pending_serializer.data,
-            'recent_filled_prescriptions': filled_serializer.data,
+            'filled_prescriptions': filled_serializer.data
         })
 
 # New view for listing prescriptions with limited patient info
