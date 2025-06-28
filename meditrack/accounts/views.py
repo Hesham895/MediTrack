@@ -57,16 +57,15 @@ class DoctorListView(generics.ListAPIView):
     serializer_class = DoctorSerializer
 
     def get_queryset(self):
-        queryset = Doctor.objects.all()
         doctor_id = self.request.query_params.get('id')
         name = self.request.query_params.get('name')
 
         if doctor_id:
-            return queryset.filter(id=doctor_id)
+            return Doctor.objects.filter(id=doctor_id)
         elif name:
-            return queryset.filter(
+            return Doctor.objects.filter(
                 user__first_name__icontains=name
-            ) | queryset.filter(
+            ) | Doctor.objects.filter(
                 user__last_name__icontains=name
             )
         return Doctor.objects.none()
