@@ -44,8 +44,25 @@ class PrescriptionSerializer(serializers.ModelSerializer):
 
 class MedicalRecordSerializer(serializers.ModelSerializer):
     prescriptions = PrescriptionSerializer(many=True, read_only=True)
-    
+    doctor_name = serializers.SerializerMethodField()  
+
     class Meta:
         model = MedicalRecord
-        fields = ('id', 'patient', 'doctor', 'diagnosis', 'symptoms', 'notes', 'created_at', 'prescriptions')
+        fields = (
+            'id',
+            'patient',
+            'doctor',
+            'doctor_name',  
+            'diagnosis',
+            'symptoms',
+            'notes',
+            'created_at',
+            'prescriptions'
+        )
         read_only_fields = ('created_at', 'doctor')
+
+    def get_doctor_name(self, obj):
+        try:
+            return f"{obj.doctor.user.first_name} {obj.doctor.user.last_name}"
+        except AttributeError:
+            return None

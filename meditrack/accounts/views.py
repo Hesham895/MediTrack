@@ -67,3 +67,23 @@ class PharmacistListView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     # Allow search by id, first name, and last name
     search_fields = ['id', 'user__first_name', 'user__last_name']
+
+class DoctorProfileView(generics.RetrieveAPIView):
+    serializer_class = DoctorSerializer
+    permission_classes = (IsDoctor,)
+
+    def get_object(self):
+        return Doctor.objects.get(user=self.request.user)
+class PharmacistProfileView(generics.RetrieveAPIView):
+    serializer_class = PharmacistSerializer
+    permission_classes = (IsPharmacist,)
+
+    def get_object(self):
+        return Pharmacist.objects.get(user=self.request.user)   
+    
+class PatientProfileView(generics.RetrieveAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = (IsPatient,)
+
+    def get_object(self):
+        return Patient.objects.get(user=self.request.user)
