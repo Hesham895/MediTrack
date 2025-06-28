@@ -52,13 +52,21 @@ class PatientListView(generics.ListAPIView):
     # Allow search by id, first name, and last name
     search_fields = ['id', 'user__first_name', 'user__last_name']
 
-class DoctorListView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = DoctorSerializer
+def get_queryset(self):
     queryset = Doctor.objects.all()
-    filter_backends = [filters.SearchFilter]
-    # Allow search by id, first name, and last name
-    search_fields = ['id', 'user__first_name', 'user__last_name']
+    doctor_id = self.request.query_params.get('id')
+    name = self.request.query_params.get('name')
+
+    if doctor_id:
+        return queryset.filter(id=doctor_id)
+    elif name:
+        return queryset.filter(
+            user__first_name__icontains=name
+        ) | queryset.filter(
+            user__last_name__icontains=name
+        )
+    # If no filter is provided, return an empty queryset
+    return Doctor.objects.none()
 
 class PharmacistListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
