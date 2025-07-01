@@ -1,0 +1,36 @@
+/**
+ * API Endpoints Documentation
+ * 
+ * PATIENT ENDPOINTS
+ * api/patients/dashboard/ - Get patient dashboard information
+ * api/medical/medical-records/?patient=${patientId} - Retrieve medical records for specific patient
+ * api/patients/prescriptions/ - Get all prescriptions for the logged in patient
+ * 
+ * PHARMACIST ENDPOINTS
+ * api/pharmacy/dashboard/ - Get pharmacist dashboard information
+ * api/pharmacy/prescription-list/?page=${page} - Get paginated list of prescriptions
+ * api/pharmacy/prescription-list/search_patient/?q=${encodeURIComponent(query)} - Search prescriptions by patient
+ * api/pharmacy/prescriptions/${prescriptionId}/fill_prescription/ - Mark a prescription as filled
+ * api/pharmacy/logs/ - Get pharmacy activity logs
+ * api/pharmacy/prescription-list/${id}/ - Get specific prescription details
+ * 
+ * DOCTOR ENDPOINTS
+ * /api/medical/medical-records/ [GET] - Retrieve medical records
+ * /api/medical/medical-records/ [POST] - Create new medical record
+ * /api/medical/prescriptions/ - Manage patient prescriptions
+ * /api/auth/patients/?search=${search} - Search for patients
+ * 
+ * REGISTRATION ENDPOINTS
+ * /api/auth/register/patient/ - Register new patient
+ * /api/auth/register/doctor/ - Register new doctor
+ * /api/auth/register/pharmacist/ - Register new pharmacist
+ * 
+ * AUTHENTICATION ENDPOINTS
+ * /api/auth/token/ - Get authentication token
+ * /api/auth/profile/ - Get user profile information
+ * 
+ * PROFILE ENDPOINTS
+ * /api/auth/patients/me/ - Get current patient profile
+ * /api/auth/doctors/me/ - Get current doctor profile
+ * /api/auth/pharmacists/me/ - Get current pharmacist profile
+ */
