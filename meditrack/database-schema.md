@@ -1,4 +1,6 @@
 # MediTrack Database Schema
+Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-07-02 18:01:45
+Current User's Login: Abdalla Rabea Mabed
 
 ```mermaid
 erDiagram
